@@ -18,4 +18,13 @@ public class AccountRepository {
     public Optional<Account> findByNumber(String accountNumber) {
         return Optional.ofNullable(accountsByNumber.get(accountNumber));
     }
+
+    public Collection<? extends Account> findByCustomerId(String customerId) {
+        List<Account>result=new ArrayList<>();
+        for (Account a: accountsByNumber.values()){
+            if (a.getCustomerId().equals(customerId))
+                result.add(a);
+        }
+        return result;
+    }
 }

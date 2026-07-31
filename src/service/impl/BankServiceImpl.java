@@ -1,25 +1,32 @@
 package service.impl;
 
 import domain.Account;
+import domain.Customer;
 import domain.Transaction;
 import domain.Type;
 import repository.AccountRepository;
+import repository.CustomerRepository;
 import repository.TransactionRepository;
 import service.BankService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class BankServiceImpl implements BankService {
     private final AccountRepository accountRepository = new AccountRepository();
     private final TransactionRepository transactionRepository = new TransactionRepository();
+    private final CustomerRepository customerRepository = new CustomerRepository();
     @Override
     public String openAccount(String name, String email, String accountType) {
         String customerId= UUID.randomUUID().toString();
+
+        //Create Customer
+        Customer c=new Customer(customerId,name,email);
+        customerRepository.save(c);
 
         //Will change later
 //        String accountNumber=UUID.randomUUID().toString();
@@ -86,6 +93,25 @@ public class BankServiceImpl implements BankService {
                 .toString(), Type.TRANSFER_IN,to.getAccountNumber(),
                 amount, LocalDateTime.now(),"Amount added");
         transactionRepository.add(toTransaction);
+    }
+
+    @Override
+    public List<Transaction> getStatement(String account) {
+        return transactionRepository.findByAccount(account).stream().
+                sorted(Comparator.comparing(Transaction::getTimeStamp))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Account> searchAccountByName(String q) {
+        String query=(q==null) ? "":q.toLowerCase();
+        List<Account>result=new ArrayList<>();
+        for (Customer c: customerRepository.findAll()){
+            if (c.getName().toLowerCase().contains(query))
+                result.addAll(accountRepository.findByCustomerId(c.getId()));
+        }
+        result.sort(Comparator.comparing(Account::getAccountNumber));
+        return result;
     }
 
     private String getAccountNumber() {
