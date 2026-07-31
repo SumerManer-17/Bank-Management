@@ -32,7 +32,7 @@ public class Main {
                 case "1" -> openAccount(scanner,bankService);
                 case "2" -> deposit(scanner,bankService);
                 case "3" -> withdraw(scanner,bankService);
-                case "4" -> transfer(scanner);
+                case "4" -> transfer(scanner,bankService);
                 case "5" -> statements(scanner);
                 case "6" -> listAccounts(scanner,bankService);
                 case "7" -> searchAccount(scanner);
@@ -54,8 +54,15 @@ public class Main {
         
     }
 
-    private static void transfer(Scanner scanner) {
-        
+    private static void transfer(Scanner scanner, BankService bankService) {
+        System.out.println("From Account: ");
+        String from=scanner.nextLine().trim();
+        System.out.println("To Account: ");
+        String to=scanner.nextLine().trim();
+        System.out.println("Enter Amount: ");
+        Double amount=Double.valueOf(scanner.nextLine().trim());
+        bankService.transfer(from,to,amount,"Transfered");
+        System.out.println("Amount transferred successfully");
     }
 
     private static void withdraw(Scanner scanner,BankService bankService) {
